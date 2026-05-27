@@ -4,3 +4,20 @@ server:
 spring:
   application:
     name: product-api
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5435/product
+    username: admin  # Nota: Garanta que o user no Docker realmente seja admin (ou mude para postgres)
+    password: ufc123
+    hikari:
+      maximum-pool-size: 3 # Substitui o antigo maxActive de forma moderna
+
+  jpa:
+    hibernate:
+      ddl-auto: update # 👈 AQUI: 'update' faz o Hibernate criar/atualizar as tabelas sozinho
+    show-sql: true     # Nota: Mudou de show_sql para show-sql (hífen)
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
