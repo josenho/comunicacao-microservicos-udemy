@@ -15,7 +15,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update # 👈 AQUI: 'update' faz o Hibernate criar/atualizar as tabelas sozinho
+      ddl-auto: create
     show-sql: true     # Nota: Mudou de show_sql para show-sql (hífen)
     properties:
       hibernate:
