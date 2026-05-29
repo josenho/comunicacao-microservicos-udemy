@@ -1,4 +1,4 @@
-package br.com.curso_udemy.product_api.modules.product.dto;
+package br.com.curso_udemy.product_api.modules.category.dto;
 
 import lombok.Data;
 

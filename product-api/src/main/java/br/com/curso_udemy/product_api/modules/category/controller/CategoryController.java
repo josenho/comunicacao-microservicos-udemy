@@ -1,8 +1,8 @@
-package br.com.curso_udemy.product_api.modules.product.controller;
+package br.com.curso_udemy.product_api.modules.category.controller;
 
-import br.com.curso_udemy.product_api.modules.product.dto.CategoryRequest;
-import br.com.curso_udemy.product_api.modules.product.dto.CategoryResponse;
-import br.com.curso_udemy.product_api.modules.product.service.CategoryService;
+import br.com.curso_udemy.product_api.modules.category.dto.CategoryRequest;
+import br.com.curso_udemy.product_api.modules.category.dto.CategoryResponse;
+import br.com.curso_udemy.product_api.modules.category.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

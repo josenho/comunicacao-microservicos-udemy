@@ -1,6 +1,6 @@
-package br.com.curso_udemy.product_api.modules.product.dto;
+package br.com.curso_udemy.product_api.modules.category.dto;
 
-import br.com.curso_udemy.product_api.modules.product.model.Category;
+import br.com.curso_udemy.product_api.modules.category.model.Category;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
