@@ -1,6 +1,8 @@
 package br.com.curso_udemy.product_api.modules.supplier.controller;
 
+import br.com.curso_udemy.product_api.config.exception.SuccessResponse;
 import br.com.curso_udemy.product_api.modules.category.dto.CategoryResponse;
+import br.com.curso_udemy.product_api.modules.product.service.ProductService;
 import br.com.curso_udemy.product_api.modules.supplier.dto.SupplierRequest;
 import br.com.curso_udemy.product_api.modules.supplier.dto.SupplierResponse;
 import br.com.curso_udemy.product_api.modules.supplier.service.SupplierService;
@@ -15,6 +17,8 @@ public class SupplierController {
 
     @Autowired
     private SupplierService supplierService;
+    @Autowired
+    private ProductService productService;
 
     @PostMapping
     public SupplierResponse save(@RequestBody SupplierRequest request){
@@ -34,5 +38,10 @@ public class SupplierController {
     @GetMapping("name/{name}")
     public List<SupplierResponse> findByName(@PathVariable String name){
         return supplierService.findByName(name);
+    }
+
+    @DeleteMapping("{id}")
+    public SuccessResponse delete(@PathVariable Integer id){
+        return supplierService.delete(id);
     }
 }

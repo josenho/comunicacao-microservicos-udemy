@@ -1,13 +1,12 @@
 package br.com.curso_udemy.product_api.modules.product.service;
 
+import br.com.curso_udemy.product_api.config.exception.SuccessResponse;
 import br.com.curso_udemy.product_api.config.exception.ValidationException;
 import br.com.curso_udemy.product_api.modules.category.service.CategoryService;
 import br.com.curso_udemy.product_api.modules.product.dto.ProductRequest;
 import br.com.curso_udemy.product_api.modules.product.dto.ProductResponse;
 import br.com.curso_udemy.product_api.modules.product.model.Product;
 import br.com.curso_udemy.product_api.modules.product.repository.ProductRepository;
-import br.com.curso_udemy.product_api.modules.supplier.dto.SupplierResponse;
-import br.com.curso_udemy.product_api.modules.supplier.model.Supplier;
 import br.com.curso_udemy.product_api.modules.supplier.service.SupplierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -105,12 +104,29 @@ public class ProductService {
     }
 
     public Product findById(Integer id){
-        if (isEmpty(id)){
-            throw new ValidationException("The product ID must be informed.");
-        }
+        ValidateInformedId(id);
         return productRepository
                 .findById(id)
                 .orElseThrow(() -> new ValidationException("There's no product for the given ID."));
     }
 
+    public Boolean existByCategoryId(Integer categoryId){
+        return productRepository.existByCategoryId(categoryId);
+    }
+
+    public Boolean existBySupplierId(Integer supplierId){
+        return productRepository.existBySupplierId(supplierId);
+    }
+
+    public SuccessResponse delete(Integer id){
+        ValidateInformedId(id);
+        productRepository.deleteById(id);
+        return SuccessResponse.create("The product was deleted.");
+    }
+
+    private void ValidateInformedId(Integer id){
+        if (isEmpty(id)){
+            throw new ValidationException("The product ID must be informed.");
+        }
+    }
 }

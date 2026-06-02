@@ -1,8 +1,10 @@
 package br.com.curso_udemy.product_api.modules.category.controller;
 
+import br.com.curso_udemy.product_api.config.exception.SuccessResponse;
 import br.com.curso_udemy.product_api.modules.category.dto.CategoryRequest;
 import br.com.curso_udemy.product_api.modules.category.dto.CategoryResponse;
 import br.com.curso_udemy.product_api.modules.category.service.CategoryService;
+import br.com.curso_udemy.product_api.modules.product.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,5 +35,10 @@ public class CategoryController {
     @GetMapping("description/{description}")
     public List<CategoryResponse> findByDescription(@PathVariable String description){
         return categoryService.findByDescription(description);
+    }
+
+    @DeleteMapping("{id}")
+    public SuccessResponse delete(@PathVariable Integer id){
+        return categoryService.delete(id);
     }
 }

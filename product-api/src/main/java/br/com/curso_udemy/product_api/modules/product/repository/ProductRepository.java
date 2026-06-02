@@ -12,4 +12,8 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     List<Product> findByCategoryId(Integer id);
 
     List<Product> findBySupplierId(Integer id);
+
+    Boolean existByCategoryId(Integer id);
+
+    Boolean existBySupplierId(Integer id);
 }
