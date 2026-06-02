@@ -6,9 +6,14 @@ import br.com.curso_udemy.product_api.modules.product.dto.ProductRequest;
 import br.com.curso_udemy.product_api.modules.product.dto.ProductResponse;
 import br.com.curso_udemy.product_api.modules.product.model.Product;
 import br.com.curso_udemy.product_api.modules.product.repository.ProductRepository;
+import br.com.curso_udemy.product_api.modules.supplier.dto.SupplierResponse;
+import br.com.curso_udemy.product_api.modules.supplier.model.Supplier;
 import br.com.curso_udemy.product_api.modules.supplier.service.SupplierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
@@ -52,6 +57,60 @@ public class ProductService {
         if(isEmpty(request.getSupplierId())) {
             throw new ValidationException("The supplier Id was not informed.");
         }
+    }
+
+    public List<ProductResponse> findAll() {
+        return productRepository
+                .findAll()
+                .stream()
+                .map(ProductResponse::of)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductResponse> findByName(String name) {
+        if (isEmpty(name)){
+            throw new ValidationException("The product name must be informed.");
+        }
+        return productRepository
+                .findByNameIgnoreCaseContaining(name)
+                .stream()
+                .map(ProductResponse::of)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductResponse> findBySupplierId(Integer supplierId) {
+        if (isEmpty(supplierId)){
+            throw new ValidationException("The product's supplier ID must be informed.");
+        }
+        return productRepository
+                .findBySupplierId(supplierId)
+                .stream()
+                .map(ProductResponse::of)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductResponse> findByCategoryId(Integer categoryId) {
+        if (isEmpty(categoryId)){
+            throw new ValidationException("The product's category ID must be informed.");
+        }
+        return productRepository
+                .findByCategoryId(categoryId)
+                .stream()
+                .map(ProductResponse::of)
+                .collect(Collectors.toList());
+    }
+
+    public ProductResponse findByIdResponse(Integer id){
+        return ProductResponse.of(findById(id));
+    }
+
+    public Product findById(Integer id){
+        if (isEmpty(id)){
+            throw new ValidationException("The product ID must be informed.");
+        }
+        return productRepository
+                .findById(id)
+                .orElseThrow(() -> new ValidationException("There's no product for the given ID."));
     }
 
 }
