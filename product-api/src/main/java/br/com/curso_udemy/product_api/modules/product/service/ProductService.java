@@ -37,6 +37,18 @@ public class ProductService {
         return ProductResponse.of(product);
     }
 
+    public ProductResponse update(ProductRequest request, Integer id){
+        validateProductDataInformed(request);
+        ValidateInformedId(id);
+        validateCategoryAndSupplierIdInformed(request);
+        var category = categoryService.findById(request.getCategoryId());
+        var supplier = supplierService.findById(request.getSupplierId());
+        var product = Product.of(request, supplier, category);
+        product.setId(id);
+        productRepository.save(product);
+        return ProductResponse.of(product);
+    }
+
     private void validateProductDataInformed (ProductRequest request){
         if(isEmpty(request.getName())) {
             throw new ValidationException("The product name was not informed.");
@@ -111,11 +123,11 @@ public class ProductService {
     }
 
     public Boolean existByCategoryId(Integer categoryId){
-        return productRepository.existByCategoryId(categoryId);
+        return productRepository.existsByCategoryId(categoryId);
     }
 
     public Boolean existBySupplierId(Integer supplierId){
-        return productRepository.existBySupplierId(supplierId);
+        return productRepository.existsBySupplierId(supplierId);
     }
 
     public SuccessResponse delete(Integer id){

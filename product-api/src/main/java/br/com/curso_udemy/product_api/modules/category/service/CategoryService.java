@@ -8,6 +8,7 @@ import br.com.curso_udemy.product_api.modules.category.model.Category;
 import br.com.curso_udemy.product_api.modules.category.repository.CategoryRepository;
 import br.com.curso_udemy.product_api.modules.product.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
     @Autowired
+    @Lazy
     private ProductService productService;
 
     public CategoryResponse findByIdResponse(Integer id) {
@@ -56,6 +58,15 @@ public class CategoryService {
     public CategoryResponse save(CategoryRequest request){
         ValidateCategoryNameInformed(request);
         var category = categoryRepository.save(Category.of(request));
+        return CategoryResponse.of(category);
+    }
+
+    public CategoryResponse update(CategoryRequest request, Integer id){
+        ValidateCategoryNameInformed(request);
+        ValidateInformedId(id);
+        var category = Category.of(request);
+        category.setId(id);
+        categoryRepository.save(category);
         return CategoryResponse.of(category);
     }
 
