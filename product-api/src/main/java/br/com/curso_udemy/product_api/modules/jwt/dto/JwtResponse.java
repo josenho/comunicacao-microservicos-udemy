@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tools.jackson.databind.ObjectMapper;
 
 @Data
 @Builder
@@ -18,12 +19,7 @@ public class JwtResponse {
 
     public static JwtResponse getUser(Claims jwtClaims){
         try {
-            return JwtResponse
-                    .builder()
-                    .id((Integer) jwtClaims.get("id"))
-                    .name((String) jwtClaims.get("name"))
-                    .email((String) jwtClaims.get("email"))
-                    .build();
+            return new ObjectMapper().convertValue(jwtClaims.get("authUser"), JwtResponse.class);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
