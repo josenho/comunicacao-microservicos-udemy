@@ -3,12 +3,17 @@ package br.com.curso_udemy.product_api.modules.product.service;
 import br.com.curso_udemy.product_api.config.exception.SuccessResponse;
 import br.com.curso_udemy.product_api.config.exception.ValidationException;
 import br.com.curso_udemy.product_api.modules.category.service.CategoryService;
+import br.com.curso_udemy.product_api.modules.product.dto.ProductQuantityDTO;
 import br.com.curso_udemy.product_api.modules.product.dto.ProductRequest;
 import br.com.curso_udemy.product_api.modules.product.dto.ProductResponse;
 import br.com.curso_udemy.product_api.modules.product.dto.ProductStockDTO;
 import br.com.curso_udemy.product_api.modules.product.model.Product;
 import br.com.curso_udemy.product_api.modules.product.repository.ProductRepository;
+import br.com.curso_udemy.product_api.modules.sales.dto.SalesConfirmationDTO;
+import br.com.curso_udemy.product_api.modules.sales.enums.SalesStatus;
+import br.com.curso_udemy.product_api.modules.sales.rabbitmq.SalesConfirmationSender;
 import br.com.curso_udemy.product_api.modules.supplier.service.SupplierService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +22,7 @@ import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
+@Slf4j
 @Service
 public class ProductService {
 
@@ -28,6 +34,8 @@ public class ProductService {
     private SupplierService supplierService;
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private SalesConfirmationSender salesConfirmationSender;
 
     public ProductResponse save(ProductRequest request){
         validateProductDataInformed(request);
@@ -144,6 +152,68 @@ public class ProductService {
     }
 
     public void updateProductStock(ProductStockDTO product){
+        try {
+            validateStockUpdateData(product);
+            updateData(product);
+        } catch (Exception e) {
+            log.error("Error while trying to update stock for message with error: {}", e.getMessage(), e);
+            var rejectedMessage = new SalesConfirmationDTO(product.getSalesId(), SalesStatus.REJECTED);
+            salesConfirmationSender.sendSalesConfirmationMessage(rejectedMessage);
+        }
+    }
 
+    private void validateStockUpdateData(ProductStockDTO product){
+        if(isEmpty(product)
+                || isEmpty(product.getSalesId())) {
+            throw new ValidationException("The product or sales ID cannot be null.");
+        }
+        if(isEmpty(product.getProducts())){
+            throw new ValidationException(("The sales products must be informed."));
+        }
+        product.getProducts().forEach(salesProduct ->{
+            if(isEmpty(salesProduct.getQuantity())
+                    || isEmpty(salesProduct.getProductId())){
+                throw new ValidationException("The product ID and the quantity must be informed.");
+            }
+        });
+    }
+
+    private void updateData(ProductStockDTO product){
+        product
+                .getProducts()
+                .forEach(salesProduct -> {
+                    var existingProduct = findById(salesProduct.getProductId());
+                    validateQuantityInStock(salesProduct, existingProduct);
+                    existingProduct.updateStock(salesProduct.getQuantity());
+                    productRepository.save(existingProduct);
+                    var approvedMessage = new SalesConfirmationDTO(product.getSalesId(), SalesStatus.APPROVED);
+                    salesConfirmationSender.sendSalesConfirmationMessage(approvedMessage);
+                });
+    }
+
+    private void validateQuantityInStock(ProductQuantityDTO salesProduct,
+                                         Product existingProduct) {
+        if(salesProduct.getQuantity() > existingProduct.getQuantityAvailable()) {
+            throw new ValidationException(
+                    String.format("The product %s is out of stock.", existingProduct.getId()));
+        }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
