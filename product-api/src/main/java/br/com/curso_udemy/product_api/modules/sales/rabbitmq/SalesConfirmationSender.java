@@ -21,13 +21,21 @@ public class SalesConfirmationSender {
     @Value("${app-config.rabbit.routingKey.sales-confirmation}")
     private String salesConfirmationKey;
 
-    public void sendSalesConfirmationMessage(SalesConfirmationDTO message){
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    public void sendSalesConfirmationMessage(SalesConfirmationDTO message) {
         try {
-            log.info("Sending Message: {}", new ObjectMapper().writeValueAsString(message));
-            rabbitTemplate.convertAndSend(productTopicExchange, salesConfirmationKey, message);
-            log.info("Message was sent successfully.");
+            log.info("Preparando envio da confirmação de venda: {}", message);
+
+            // Convertemos o DTO para uma String JSON pura!
+            String jsonMessage = MAPPER.writeValueAsString(message);
+
+            // Enviamos a String! O RabbitMQ aceita texto puro sem reclamar de versões
+            rabbitTemplate.convertAndSend(productTopicExchange, salesConfirmationKey, jsonMessage);
+
+            log.info("Mensagem enviada com sucesso para o RabbitMQ.");
         } catch (Exception e) {
-            log.info("Error while trying to send sales confirmation message. ", e);
+            log.error("Erro fatal ao tentar enviar mensagem de confirmação de venda. ", e);
         }
     }
 }
